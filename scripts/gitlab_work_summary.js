@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      0.1
+// @version      1.0
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。
 // @author       kiccer<1072907338@qq.com>
 // @match        http://192.168.1.128:8088/*
