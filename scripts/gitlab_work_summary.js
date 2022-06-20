@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      1.0
+// @version      2.0
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
@@ -16,9 +16,10 @@
 // @resource daterangepicker_css https://cdn.bootcdn.net/ajax/libs/bootstrap-daterangepicker/3.1/daterangepicker.min.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
-/* globals $ GM_addStyle GM_getResourceText moment Pager ClipboardJS toastr */
+/* globals $ GM_addStyle GM_getResourceText GM_xmlhttpRequest moment Pager ClipboardJS toastr */
 
 (function () {
     'use strict'
@@ -59,6 +60,7 @@
         const text = getTextBySummary(startTime, endTime, summaryList)
 
         copy(text)
+        toastr.success('复制成功！')
     })
 
     // 自定义汇总时间范围
@@ -73,9 +75,11 @@
     // 日期选择期 (https://github.com/dangrossman/daterangepicker)
     const dateRange = $('<input type="text" name="daterange" class="kiccer-daterange-input" />')
     customBtn.append(dateRange)
+
     dateRange.on('click', e => {
         e.stopPropagation()
     })
+
     $('input[name="daterange"]').daterangepicker({
         opens: 'left',
         locale: {
@@ -91,32 +95,69 @@
             monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
             firstDay: 1
         }
-    }, (start, end, label) => {
-        // 循环加载页面直到满足指定获取完日期范围的数据
-        const loop = async () => {
-            const lastEventItemTime = moment($('.event-item:last time').attr('datetime'))
+    }, async (start, end, label) => {
+        await loadPageUntil(start)
 
-            if (lastEventItemTime < start) {
-                const startTime = start.format('YYYY-MM-DD 00:00:00')
-                const endTime = end.format('YYYY-MM-DD 23:59:59')
-                const summaryList = getSummary(startTime, endTime)
-                const text = getTextBySummary(startTime, endTime, summaryList)
+        const startTime = start.format('YYYY-MM-DD 00:00:00')
+        const endTime = end.format('YYYY-MM-DD 23:59:59')
+        const summaryList = getSummary(startTime, endTime)
+        const text = getTextBySummary(startTime, endTime, summaryList)
 
-                copy(text)
-            } else {
-                await loadPage()
-                loop()
-            }
-        }
-
-        loop()
+        copy(text)
+        toastr.success('复制成功！')
     })
+
+    // 智能生成周报
+    const smartBtn = $('<a>')
+    smartBtn.addClass('btn btn-gray')
+    smartBtn.html('智能生成')
+    smartBtn.appendTo(btnContainer)
+    smartBtn.on('click', async e => {
+        const endTime = moment(await findDate(moment(), [0])).format('YYYY-MM-DD 23:59:59')
+        const startTime = moment(await findDate(endTime, [1, 2])).add(1, 'day').format('YYYY-MM-DD 00:00:00')
+        const summaryList = getSummary(startTime, endTime)
+        const text = getTextBySummary(startTime, endTime, summaryList)
+
+        copy(text)
+        toastr.success('复制成功！')
+    })
+
+    // 向前寻找日期，工作日0 周末1 法定节假日2，例：findDate(今天, 0) 从今天开始往前找，返回最近的一个工作日日期。
+    function findDate (start, type = [0]) {
+        return new Promise((resolve, reject) => {
+            const loop = (time) => {
+                // 节假日万年历API: http://www.free-api.com/doc/562
+                GM_xmlhttpRequest({
+                    url: `https://www.mxnzp.com/api/holiday/single/${time}?ignoreHoliday=false&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09`,
+                    onload: res => {
+                        const { data } = JSON.parse(res.response)
+                        output(`${moment(time).format('YYYY-MM-DD')} 是 ${['工作日', '周末', '法定节假日'][data.type]}`)
+
+                        // console.log(data)
+                        if (type.includes(data.type)) {
+                            resolve(time)
+                        } else {
+                            loop(moment(time).subtract(1, 'day').format('YYYYMMDD'))
+                        }
+                    }
+                })
+            }
+
+            loop(moment(start).format('YYYYMMDD'))
+        })
+    }
+
+    // 控制台输出
+    function output (msg) {
+        console.log(`%c[${moment().format('HH:mm:ss')}'${String(Date.now() % 1000).padStart(3, '0')}] %c${msg}`, 'color: red', 'color: blue')
+    }
 
     // 加载页面
     function loadPage () {
         return new Promise((resolve, reject) => {
             const total = $('.event-item').length
             Pager.getOld()
+            output('加载页面：' + (Pager.offset / Pager.limit + 1))
 
             // 轮询，当条数发生改变时视为加载成功
             const loop = () => {
@@ -133,13 +174,32 @@
         })
     }
 
+    // 按日期加载足够的页面
+    function loadPageUntil (time) {
+        return new Promise((resolve, reject) => {
+            // 循环加载页面直到满足指定获取完日期范围的数据
+            const loop = async () => {
+                const lastEventItemTime = moment($('.event-item:last time').attr('datetime'))
+
+                if (lastEventItemTime < time) {
+                    resolve()
+                } else {
+                    await loadPage()
+                    loop()
+                }
+            }
+
+            loop()
+        })
+    }
+
     // 多查几页记录
-    setTimeout(() => {
-        Array(5).fill(loadPage).reduce(async (n, m) => {
-            await n
-            return m()
-        }, Promise.resolve())
-    }, 1000)
+    // setTimeout(() => {
+    //     Array(5).fill(loadPage).reduce(async (n, m) => {
+    //         await n
+    //         return m()
+    //     }, Promise.resolve())
+    // }, 1000)
 
     // 获取汇总列表
     function getSummary (startTime, endTime) {
@@ -239,7 +299,5 @@
         })
 
         btn.click()
-
-        toastr.success('复制成功！')
     }
 })()
