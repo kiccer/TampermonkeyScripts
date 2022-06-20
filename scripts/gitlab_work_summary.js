@@ -69,7 +69,7 @@
         dateRange.click()
     })
 
-    // 日期选择期
+    // 日期选择期 (https://github.com/dangrossman/daterangepicker)
     const dateRange = $('<input type="text" name="daterange" class="kiccer-daterange-input" />')
     customBtn.append(dateRange)
     dateRange.on('click', e => {
