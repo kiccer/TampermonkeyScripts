@@ -1,0 +1,31 @@
+{
+  "name": "tampermonkey_scripts",
+  "version": "1.0.0",
+  "description": "kiccer's tampermonkey scripts.",
+  "main": "null",
+  "scripts": {
+    "eslint-init": "eslint --init",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiccer/TampermonkeyScripts.git"
+  },
+  "keywords": [
+    "tampermonkey",
+    "scripts"
+  ],
+  "author": "kiccer <1072907338@qq.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kiccer/TampermonkeyScripts/issues"
+  },
+  "homepage": "https://github.com/kiccer/TampermonkeyScripts#readme",
+  "devDependencies": {
+    "eslint": "^8.0.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0"
+  }
+}

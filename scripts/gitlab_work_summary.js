@@ -17,18 +17,31 @@
 // @grant        GM_getResourceText
 // ==/UserScript==
 
-(function() {
-    'use strict';
+/* globals $ GM_addStyle GM_getResourceText moment Pager ClipboardJS toastr */
+
+(function () {
+    'use strict'
 
     const targetPath = $('.header-user-dropdown-toggle').attr('href')
     const currentPath = location.pathname
-    
+
     // 判断是否是目标地址
     if (targetPath !== currentPath) return
 
     // 加载 CSS
     GM_addStyle(GM_getResourceText('toastr_css'))
     GM_addStyle(GM_getResourceText('daterangepicker_css'))
+    GM_addStyle(`
+        .kiccer-daterange-input {
+            visibility: hidden;
+            width: 0;
+            height: 32px;
+            border: 0;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+        }
+    `)
 
     // 按钮容器
     const btnContainer = $('.cover-controls')
@@ -51,11 +64,51 @@
     const customBtn = $('<a>')
     customBtn.addClass('btn btn-gray')
     customBtn.html('自定义时间')
-    const dateRange = $('<input type="text" name="daterange" style="display: none;" />')
-    customBtn.append(dateRange)
     customBtn.appendTo(btnContainer)
-    copyBtn.on('click', e => {
+    customBtn.on('click', e => {
+        dateRange.click()
+    })
 
+    // 日期选择期
+    const dateRange = $('<input type="text" name="daterange" class="kiccer-daterange-input" />')
+    customBtn.append(dateRange)
+    dateRange.on('click', e => {
+        e.stopPropagation()
+    })
+    $('input[name="daterange"]').daterangepicker({
+        opens: 'left',
+        locale: {
+            format: 'YYYY-MM-DD',
+            separator: ' - ',
+            applyLabel: '确定',
+            cancelLabel: '取消',
+            fromLabel: '从',
+            toLabel: '至',
+            customRangeLabel: '自定义',
+            weekLabel: '周',
+            daysOfWeek: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+            monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            firstDay: 1
+        }
+    }, (start, end, label) => {
+        // 循环加载页面直到满足指定获取完日期范围的数据
+        const loop = async () => {
+            const lastEventItemTime = moment($('.event-item:last time').attr('datetime'))
+
+            if (lastEventItemTime < start) {
+                const startTime = start.format('YYYY-MM-DD 00:00:00')
+                const endTime = end.format('YYYY-MM-DD 23:59:59')
+                const summaryList = getSummary(startTime, endTime)
+                const text = getTextBySummary(startTime, endTime, summaryList)
+
+                copy(text)
+            } else {
+                await loadPage()
+                loop()
+            }
+        }
+
+        loop()
     })
 
     // 加载页面
@@ -110,7 +163,7 @@
         })
 
         // 内容归整
-        let project = []
+        const project = []
 
         inScoped.forEach(scope => {
             const projectName = scope.project
@@ -169,7 +222,7 @@
         })
 
         res.push('\n总结：\n    ')
-        
+
         return res.join('\n')
     }
 
@@ -179,6 +232,7 @@
 
         btn.attr('data-text', text)
 
+        // eslint-disable-next-line no-new
         new ClipboardJS(btn[0], {
             text: trigger => trigger.getAttribute('data-text')
         })
@@ -187,4 +241,4 @@
 
         toastr.success('复制成功！')
     }
-})();
+})()
