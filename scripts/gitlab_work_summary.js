@@ -4,6 +4,7 @@
 // @version      1.0
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。
 // @author       kiccer<1072907338@qq.com>
+// @license      MIT
 // @match        http://192.168.1.128:8088/*
 // @icon         https://gd-hbimg.huaban.com/690fe61ca630eaffd3e052c73d3aa7d66d45d95a6101-gORZdx_fw658/format/webp
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
