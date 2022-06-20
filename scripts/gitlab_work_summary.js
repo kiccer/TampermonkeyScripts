@@ -20,11 +20,10 @@
 (function() {
     'use strict';
 
-    // Your code here...
-
     const targetPath = $('.header-user-dropdown-toggle').attr('href')
     const currentPath = location.pathname
     
+    // 判断是否是目标地址
     if (targetPath !== currentPath) return
 
     // 加载 CSS
