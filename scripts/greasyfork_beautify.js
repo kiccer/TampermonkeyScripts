@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.5.alpha
+// @version      0.6.alpha
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
+// @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
 // @license      MIT
 // @match        https://greasyfork.org/*
 // @icon         https://greasyfork.org/packs/media/images/blacklogo96-b2384000fca45aa17e45eb417cbcbb59.png
