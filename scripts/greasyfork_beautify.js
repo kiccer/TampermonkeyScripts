@@ -18,7 +18,7 @@
 
 /* globals GM_addStyle GM_getResourceText $ less Vue */
 
-const VERSION = '0.1'
+const VERSION = '0.3'
 
 // 自动根据浏览器语言设置当前语言
 if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
