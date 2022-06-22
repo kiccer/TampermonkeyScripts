@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.2
+// @version      0.3
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
@@ -85,6 +85,7 @@ $(() => {
             top: 0;
             z-index: 1;
             user-select: none;
+            box-shadow: 0 0 5px 2px rgb(0 0 0 / 50%);
 
             .width-constraint {
                 display: flex;
