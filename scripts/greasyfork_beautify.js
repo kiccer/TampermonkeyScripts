@@ -28,6 +28,7 @@ const VERSION = '0.1'
     const lessOptions = {}
 
     const lessInput = `
+        // --------------------------- 通用样式
         * {
             box-sizing: border-box;
             outline: none;
@@ -37,6 +38,7 @@ const VERSION = '0.1'
             background-color: #fff;
         }
 
+        // --------------------------- header
         #main-header {
             background-color: #000;
             background-image: none;
@@ -95,6 +97,7 @@ const VERSION = '0.1'
             background-color: #000;
         }
 
+        // --------------------------- bodyer
         .width-constraint {
             padding-top: 60px;
         }
