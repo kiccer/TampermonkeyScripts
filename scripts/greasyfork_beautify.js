@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.4
+// @version      0.4.alpha
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
