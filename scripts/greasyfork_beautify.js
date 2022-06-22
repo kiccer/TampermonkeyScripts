@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.4.alpha
+// @version      0.5.alpha
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
@@ -143,7 +143,11 @@ $(() => {
                     line-height: @user_container_height;
                     text-align: right;
                     font-size: 14px;
-                    padding: 0 10px;
+                    padding-right: 10px;
+
+                    @media screen and (max-width: 1228px) {
+                        margin: auto 1.2vw;
+                    }
                 }
             }
         }
