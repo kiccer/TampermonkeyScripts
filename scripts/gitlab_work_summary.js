@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      2.0
+// @version      2.1
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
@@ -21,7 +21,7 @@
 
 /* globals $ GM_addStyle GM_getResourceText GM_xmlhttpRequest moment Pager ClipboardJS toastr */
 
-(function () {
+$(() => {
     'use strict'
 
     const targetPath = $('.header-user-dropdown-toggle').attr('href')
@@ -48,15 +48,33 @@
     // 按钮容器
     const btnContainer = $('.cover-controls')
 
-    // 一键生成 GitLab 周报汇总
+    // 日报
     const copyBtn = $('<a>')
     copyBtn.addClass('btn btn-gray')
-    copyBtn.html('一键生成周报')
+    copyBtn.html('生成日报')
     copyBtn.appendTo(btnContainer)
-    copyBtn.on('click', e => {
-        const startTime = moment().subtract(7, 'day').format('YYYY-MM-DD 00:00:00')
+    copyBtn.on('click', async e => {
+        const startTime = moment().format('YYYY-MM-DD 00:00:00')
         const endTime = moment().format('YYYY-MM-DD 23:59:59')
-        const summaryList = getSummary(startTime, endTime)
+        const summaryList = await getSummary(startTime, endTime)
+        const text = getTextBySummary(startTime, endTime, summaryList)
+
+        copy(text)
+        toastr.success('复制成功！')
+    })
+
+    // 智能生成周报
+    const smartBtn = $('<a>')
+    smartBtn.addClass('btn btn-gray')
+    smartBtn.attr('title', '获取过去最近的工作周，自动判断法定节假日。')
+    smartBtn.html('智能周报')
+    smartBtn.appendTo(btnContainer)
+    smartBtn.on('click', async e => {
+        const end = await findDate(moment(), [0])
+        const start = await findDate(end.subtract(1, 'day'), [1, 2])
+        const startTime = start.add(1, 'day').format('YYYY-MM-DD 00:00:00')
+        const endTime = end.format('YYYY-MM-DD 23:59:59')
+        const summaryList = await getSummary(startTime, endTime)
         const text = getTextBySummary(startTime, endTime, summaryList)
 
         copy(text)
@@ -95,31 +113,19 @@
             monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
             firstDay: 1
         }
-    }, async (start, end, label) => {
-        await loadPageUntil(start)
+    }, (start, end, label) => {
+        // daterange changed.
+    }).on('apply.daterangepicker', async (ev, picker) => {
+        customBtn.attr('disabled', true)
 
-        const startTime = start.format('YYYY-MM-DD 00:00:00')
-        const endTime = end.format('YYYY-MM-DD 23:59:59')
-        const summaryList = getSummary(startTime, endTime)
+        const startTime = picker.startDate.format('YYYY-MM-DD 00:00:00')
+        const endTime = picker.endDate.format('YYYY-MM-DD 23:59:59')
+        const summaryList = await getSummary(startTime, endTime)
         const text = getTextBySummary(startTime, endTime, summaryList)
 
         copy(text)
         toastr.success('复制成功！')
-    })
-
-    // 智能生成周报
-    const smartBtn = $('<a>')
-    smartBtn.addClass('btn btn-gray')
-    smartBtn.html('智能生成')
-    smartBtn.appendTo(btnContainer)
-    smartBtn.on('click', async e => {
-        const endTime = moment(await findDate(moment(), [0])).format('YYYY-MM-DD 23:59:59')
-        const startTime = moment(await findDate(endTime, [1, 2])).add(1, 'day').format('YYYY-MM-DD 00:00:00')
-        const summaryList = getSummary(startTime, endTime)
-        const text = getTextBySummary(startTime, endTime, summaryList)
-
-        copy(text)
-        toastr.success('复制成功！')
+        customBtn.attr('disabled', false)
     })
 
     // 向前寻找日期，工作日0 周末1 法定节假日2，例：findDate(今天, 0) 从今天开始往前找，返回最近的一个工作日日期。
@@ -135,7 +141,7 @@
 
                         // console.log(data)
                         if (type.includes(data.type)) {
-                            resolve(time)
+                            resolve(moment(time))
                         } else {
                             loop(moment(time).subtract(1, 'day').format('YYYYMMDD'))
                         }
@@ -202,9 +208,11 @@
     // }, 1000)
 
     // 获取汇总列表
-    function getSummary (startTime, endTime) {
+    async function getSummary (startTime, endTime) {
         const eventItem = $('.event-item')
         const inScoped = []
+
+        await loadPageUntil(moment(startTime))
 
         // 提取内容
         eventItem.each((index, item) => {
@@ -300,4 +308,4 @@
 
         btn.click()
     }
-})()
+})
