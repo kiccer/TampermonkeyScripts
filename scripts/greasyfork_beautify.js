@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.3
+// @version      0.4
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
@@ -12,13 +12,14 @@
 // @resource less https://cdn.bootcdn.net/ajax/libs/less.js/4.1.3/less.min.js
 // @resource normalize.css https://cdn.bootcdn.net/ajax/libs/normalize/8.0.1/normalize.min.css
 // @run-at       document-start
+// @grant        GM_info
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
 
-/* globals GM_addStyle GM_getResourceText $ less Vue */
+/* globals GM_info GM_addStyle GM_getResourceText $ less Vue */
 
-const VERSION = '0.3'
+const VERSION = GM_info.script.version
 
 // 自动根据浏览器语言设置当前语言
 if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
