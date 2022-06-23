@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.8.alpha
+// @version      0.9.alpha
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -87,6 +87,16 @@ window.addEventListener('load', () => {
 
             &:visited {
                 color: rgb(38, 38, 38);
+            }
+        }
+
+        pre.lang-js {
+            font-family: Consolas;
+
+            ol.linenums {
+                li.L1, li.L3, li.L5, li.L7, li.L9  {
+                    background-color: rgba(0, 0, 0, .02);
+                }
             }
         }
 
