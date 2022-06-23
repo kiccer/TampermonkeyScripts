@@ -166,11 +166,17 @@ $(() => {
 
     const pageInfo = {
         offset: 0,
-        limit: 20
+        limit: 20,
+        hasNext: true
     }
 
     function loadPage () {
         return new Promise((resolve, reject) => {
+            if (!pageInfo.hasNext) {
+                reject(Error('no more pages.'))
+                return
+            }
+
             output('加载页面：' + (pageInfo.offset / pageInfo.limit + 1))
 
             $.ajax({
@@ -183,6 +189,7 @@ $(() => {
                     // console.log(data)
                     hideList.html(hideList.html() + data.html)
                     pageInfo.offset += pageInfo.limit
+                    pageInfo.hasNext = data.count === pageInfo.limit
                     resolve()
                 },
 
@@ -199,14 +206,17 @@ $(() => {
     function loadPageUntil (time) {
         return new Promise((resolve, reject) => {
             // 循环加载页面直到满足指定获取完日期范围的数据
-            const loop = async () => {
+            const loop = () => {
                 const lastEventItemTime = moment($('.content_list_hide .event-item:last time').attr('datetime'))
 
                 if (lastEventItemTime < time) {
                     resolve()
                 } else {
-                    await loadPage()
-                    loop()
+                    loadPage().then(res => {
+                        loop()
+                    }).catch(() => {
+                        resolve()
+                    })
                 }
             }
 
