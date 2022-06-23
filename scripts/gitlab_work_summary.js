@@ -212,6 +212,7 @@ $(() => {
                 if (lastEventItemTime < time) {
                     resolve()
                 } else {
+                    // 加载完，还有页面就继续加载，没了就退出。
                     loadPage().then(res => {
                         loop()
                     }).catch(() => {
