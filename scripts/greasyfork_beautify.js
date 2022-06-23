@@ -37,16 +37,29 @@ $(() => {
 
     const lessInput = `
         // --------------------------------------------- 变量
+
         @nav_height: 60px;
         @user_container_height: 24px;
 
+        // --------------------------------------------- 混合宏
+
+        .ellipsis (@lines) {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+            -webkit-line-clamp: @lines;
+        }
+
         // --------------------------------------------- 通用样式
+
         * {
             box-sizing: border-box;
             outline: none;
         }
 
         body {
+            line-height: 1.5;
             min-height: 100vh;
             background-color: #f7f7f7;
 
@@ -73,11 +86,41 @@ $(() => {
             }
 
             &:visited {
-                color: rgb(191, 191, 191);
+                color: rgb(38, 38, 38);
+            }
+        }
+
+        // --------------------------------------------- 输入框
+
+        input[type=search] {
+            padding: 3px 6px;
+            padding-right: 2.4em !important;
+            border: 1px solid #bfbfbf;
+            border-radius: 4px;
+        }
+
+        form {
+            input.search-submit {
+                top: 50% !important;
+                transform: translateY(-50%);
+                cursor: pointer;
+            }
+        }
+
+        .home-search {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-search {
+            margin-bottom: 20px;
+
+            input[type="search"] {
+                margin: 0;
             }
         }
 
         // --------------------------------------------- header
+
         #main-header {
             background-color: #000;
             background-image: none;
@@ -196,7 +239,55 @@ $(() => {
             }
         }
 
-        // --------------------------------------------- bodyer
+        // --------------------------------------------- 脚本列表
+
+        #browse-script-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 20px;
+            border: 0;
+            box-shadow: none;
+
+            li {
+                border: 1px solid #bbb;
+                box-shadow: 0 0 5px #ddd;
+                border-radius: 5px;
+                padding: 10px;
+                position: relative;
+
+                a.script-link {
+                    .ellipsis(2);
+                    height: calc(3em  + 8px);
+                    font-size: 16px;
+                    margin: 4px -10px 4px -14px;
+                    padding: 4px 10px;
+                    background: linear-gradient(#fff, #eee);
+                    border-left: 7px solid #800;
+                    box-shadow: inset 0 1px rgb(0 0 0 / 10%), inset 0 -1px rgb(0 0 0 / 10%);
+                }
+
+                .script-description {
+                    .ellipsis(3);
+                    text-indent: 2em;
+                    margin: 10px 0 10px;
+                    height: 4.5em;
+                    font-size: 14px;
+                }
+
+                .inline-script-stats {
+                    padding-top: 10px;
+                    border-top: 1px solid #ebebeb;
+
+                    dt {
+                        width: 40%;
+                    }
+
+                    dd {
+                        width: 60%;
+                    }
+                }
+            }
+        }
     `
 
     less.render(lessInput, lessOptions).then(output => {
@@ -295,4 +386,20 @@ $(() => {
             }
         }
     })
+
+    // 脚本列表页面
+    // if (/^https:\/\/greasyfork\.org\/[a-zA-Z-]+\/scripts$/.test(location.href)) {
+    //     $('#browse-script-list li[data-script-id]').each((i, dom) => {
+    //         const li = $(dom)
+    //         const cardHeader = $('<div class="card-header">')
+    //         const score = li.find('dd.script-list-ratings').data('rating-score')
+    //         const scoreWrap = $('<span class="score">')
+    //         const install = $('<a>')
+    //         li.find('> article').before(cardHeader)
+    //         cardHeader.append(scoreWrap)
+    //         cardHeader.append(install)
+    //         scoreWrap.html(score)
+    //         install.html('INSTALL')
+    //     })
+    // }
 })
