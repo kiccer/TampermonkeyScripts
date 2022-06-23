@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      2.1.1
+// @version      2.2
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -18,9 +18,10 @@
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_xmlhttpRequest
+// @noframes
 // ==/UserScript==
 
-/* globals $ GM_addStyle GM_getResourceText GM_xmlhttpRequest moment Pager ClipboardJS toastr */
+/* globals $ GM_addStyle GM_getResourceText GM_xmlhttpRequest moment ClipboardJS toastr */
 
 $(() => {
     'use strict'
@@ -159,40 +160,64 @@ $(() => {
         console.log(`%c[${moment().format('HH:mm:ss')}'${String(Date.now() % 1000).padStart(3, '0')}] %c${msg}`, 'color: red', 'color: blue')
     }
 
-    // 加载页面
+    // 加载页面 (v2.2 改为接口请求，然后放到一个隐藏元素内，兼容 gitlab 多版本)
+    const hideList = $('<div class="content_list_hide" style="display: none;">')
+    $('#activity').append(hideList)
+
+    const pageInfo = {
+        offset: 0,
+        limit: 20,
+        hasNext: true
+    }
+
     function loadPage () {
         return new Promise((resolve, reject) => {
-            const total = $('.event-item').length
-            Pager.getOld()
-            output('加载页面：' + (Pager.offset / Pager.limit + 1))
-
-            // 轮询，当条数发生改变时视为加载成功
-            const loop = () => {
-                setTimeout(() => {
-                    if ($('.event-item').length > total) {
-                        resolve()
-                    } else {
-                        loop()
-                    }
-                }, 100)
+            if (!pageInfo.hasNext) {
+                reject(Error('no more pages.'))
+                return
             }
 
-            loop()
+            output('加载页面：' + (pageInfo.offset / pageInfo.limit + 1))
+
+            $.ajax({
+                type: 'GET',
+                url: $('.content_list').data('href'),
+                data: `limit=${pageInfo.limit}&offset=${pageInfo.offset}`,
+                dataType: 'json',
+
+                success: (data) => {
+                    // console.log(data)
+                    hideList.html(hideList.html() + data.html)
+                    pageInfo.offset += pageInfo.limit
+                    pageInfo.hasNext = data.count === pageInfo.limit
+                    resolve()
+                },
+
+                error: err => {
+                    reject(err)
+                }
+            })
         })
     }
+
+    loadPage() // 加载第一页
 
     // 按日期加载足够的页面
     function loadPageUntil (time) {
         return new Promise((resolve, reject) => {
             // 循环加载页面直到满足指定获取完日期范围的数据
-            const loop = async () => {
-                const lastEventItemTime = moment($('.event-item:last time').attr('datetime'))
+            const loop = () => {
+                const lastEventItemTime = moment($('.content_list_hide .event-item:last time').attr('datetime'))
 
                 if (lastEventItemTime < time) {
                     resolve()
                 } else {
-                    await loadPage()
-                    loop()
+                    // 加载完，还有页面就继续加载，没了就退出。
+                    loadPage().then(res => {
+                        loop()
+                    }).catch(() => {
+                        resolve()
+                    })
                 }
             }
 
@@ -200,17 +225,9 @@ $(() => {
         })
     }
 
-    // 多查几页记录
-    // setTimeout(() => {
-    //     Array(5).fill(loadPage).reduce(async (n, m) => {
-    //         await n
-    //         return m()
-    //     }, Promise.resolve())
-    // }, 1000)
-
     // 获取汇总列表
     async function getSummary (startTime, endTime) {
-        const eventItem = $('.event-item')
+        const eventItem = $('.content_list_hide .event-item')
         const inScoped = []
 
         await loadPageUntil(moment(startTime))

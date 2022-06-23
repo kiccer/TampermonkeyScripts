@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.6.alpha
+// @version      0.7.alpha
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -27,7 +27,7 @@ if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
     location.href = location.href.replace(/^(https:\/\/greasyfork\.org\/)[a-zA-Z-]+(\/?.*)/, `$1${navigator.language}$2`)
 }
 
-$(() => {
+window.addEventListener('load', () => {
     // 样式初始化
     GM_addStyle(GM_getResourceText('normalize.css'))
     // eslint-disable-next-line no-eval
