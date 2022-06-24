@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.10.alpha
-// @description  Greasyfork网站美化。
+// @version      0.11.alpha
+// @description  自然、优雅，仿若本该如此...
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
 // @license      MIT
