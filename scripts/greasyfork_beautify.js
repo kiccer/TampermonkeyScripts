@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.11.alpha
+// @version      0.12.alpha
 // @description  自然、优雅，仿若本该如此...
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -97,6 +97,20 @@ window.addEventListener('load', () => {
                 li.L1, li.L3, li.L5, li.L7, li.L9  {
                     background-color: rgba(0, 0, 0, .02);
                 }
+            }
+        }
+
+        .pagination {
+            margin-top: 20px !important;
+            user-select: none;
+
+            > * {
+                padding: 0 .5em !important;
+                min-width: 2em;
+                height: 2em;
+                line-height: 2;
+                text-align: center;
+                text-decoration: none !important;
             }
         }
 
