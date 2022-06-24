@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.9.alpha
+// @version      0.10.alpha
 // @description  Greasyfork网站美化。
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -251,6 +251,8 @@ window.addEventListener('load', () => {
 
         // --------------------------------------------- 脚本列表
 
+        #user-script-list,
+        #user-deleted-script-list,
         #browse-script-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
