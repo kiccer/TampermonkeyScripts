@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.14.alpha
+// @version      0.15.alpha
 // @description  自然、优雅，仿若本该如此...
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -454,9 +454,10 @@ $(() => {
 
     // 代码高亮
     $('pre.lang-js').each((pre_i, pre) => {
-        // 获取代码
-        const code = $('<code class="language-javascript">').text(
-            $(pre).text()
+        // 调整代码，给一些压缩代码增加换行
+        $(pre).find('li').append('\n')
+        const code = $('<code class="language-javascript">').html(
+            pre.innerHTML
         )
 
         // 清空原始代码容器，放置新容器
