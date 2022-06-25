@@ -13,6 +13,14 @@ module.exports = {
     },
 
     rules: {
-        indent: ['error', 4]
+        indent: ['error', 4],
+        camelcase: ['error', {
+            properties: 'never',
+            ignoreGlobals: true,
+            ignoreDestructuring: true,
+            allow: [
+                '_i$'
+            ]
+        }]
     }
 }

@@ -11,14 +11,17 @@
 // @require      https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/less.js/4.1.3/less.min.js
+// @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/highlight.min.js
+// @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/languages/javascript.min.js
 // @resource normalize.css https://cdn.bootcdn.net/ajax/libs/normalize/8.0.1/normalize.min.css
+// @resource atom-one-dark.css https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css
 // @run-at       document-start
 // @grant        GM_info
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
 
-/* globals GM_info GM_addStyle GM_getResourceText $ less Vue */
+/* globals GM_info GM_addStyle GM_getResourceText $ less Vue hljs */
 
 const VERSION = GM_info.script.version
 
@@ -26,6 +29,10 @@ const VERSION = GM_info.script.version
 if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
     location.href = location.href.replace(/^(https:\/\/greasyfork\.org\/)[a-zA-Z-]+(\/?.*)/, `$1${navigator.language}$2`)
 }
+
+// 样式初始化
+GM_addStyle(GM_getResourceText('normalize.css'))
+GM_addStyle(GM_getResourceText('atom-one-dark.css'))
 
 const lessOptions = {}
 
@@ -84,15 +91,52 @@ const lessInput = `
         }
     }
 
-    pre.lang-js {
-        font-family: Consolas;
+    .code-container {
+        background-color: #282c34;
+        border-radius: 8px;
+        max-height: 100%;
+        overflow: visible;
 
-        ol.linenums {
-            li.L1, li.L3, li.L5, li.L7, li.L9  {
-                background-color: rgba(0, 0, 0, .02);
+        // 定义滚动条高宽及背景高宽分别对应横竖滚动条的尺寸
+        ::-webkit-scrollbar {
+            width: 14px;
+            height: 14px;
+            background-color: transparent;
+        }
+
+        // 定义滚动条轨道内阴影+圆角
+        ::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+
+        // 定义滑块内阴影+圆角
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(78, 86, 102, 0);
+        }
+
+        &:hover {
+            ::-webkit-scrollbar-thumb {
+                background-color: rgba(78, 86, 102, .5);
+            }
+        }
+
+        ::selection {
+            background-color: rgb(51, 56, 66);
+        }
+
+        pre {
+            code {
+                font-family: Consolas;
+
+                .marker {
+                    display: inline-block;
+                    color: #636d83;
+                    user-select: none;
+                }
             }
         }
     }
+
 
     .pagination {
         margin-top: 20px !important;
@@ -321,9 +365,6 @@ less.render(lessInput, lessOptions).then(output => {
 })
 
 $(() => {
-    // 样式初始化
-    GM_addStyle(GM_getResourceText('normalize.css'))
-
     // 导航
     const navContainer = document.createElement('div')
     navContainer.id = 'site-nav-vue'
@@ -409,6 +450,32 @@ $(() => {
                 isLogin: $('.sign-out-link').length > 0 // 存在登出按钮则表示已登录
             }
         }
+    })
+
+    // 代码高亮
+    $('pre.lang-js').each((pre_i, pre) => {
+        // 获取代码
+        const code = $('<code class="language-javascript">').text(
+            $(pre).text()
+        )
+
+        // 清空原始代码容器，放置新容器
+        $(pre)
+            .removeClass()
+            .html('')
+            .append(code)
+
+        // 高亮
+        hljs.highlightElement(pre.querySelector('code'))
+
+        // 增加行号
+        const html = $(pre).find('code').html()
+        const htmlSplit = html.split('\n')
+        const totalLines = htmlSplit.length
+
+        $(pre).find('code').html(
+            htmlSplit.map((n, i) => `<span class="marker" style="width: ${String(totalLines).length}em;">${i + 1}</span>${n}`).join('\n')
+        )
     })
 
     // 脚本列表页面
