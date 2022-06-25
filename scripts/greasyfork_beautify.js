@@ -405,7 +405,7 @@ $(() => {
                     const subNav = [...$(n).find('> nav > li')]
 
                     return {
-                        label: a.text(),
+                        label: a.text() || $(n).text(),
                         url: a.attr('href'),
                         list: subNav.map(m => {
                             const subA = $(m).find('> a')
