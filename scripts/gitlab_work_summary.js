@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      2.2
-// @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。
+// @version      2.3
+// @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。(主要为公司内部开发使用。因 gitlab 版本不确定性，不保证完全兼容其他 gitlab 版本，如有需求，请到 github 留 issues。)
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
 // @license      MIT
@@ -11,17 +11,17 @@
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/bootstrap-daterangepicker/3.1/moment.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/bootstrap-daterangepicker/3.1/daterangepicker.min.js
-// @require      https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/toastr.js/latest/toastr.min.js
 // @resource toastr_css https://cdn.bootcdn.net/ajax/libs/toastr.js/latest/toastr.min.css
 // @resource daterangepicker_css https://cdn.bootcdn.net/ajax/libs/bootstrap-daterangepicker/3.1/daterangepicker.min.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_xmlhttpRequest
+// @grant        GM_setClipboard
 // @noframes
 // ==/UserScript==
 
-/* globals $ GM_addStyle GM_getResourceText GM_xmlhttpRequest moment ClipboardJS toastr */
+/* globals $ GM_addStyle GM_getResourceText GM_xmlhttpRequest GM_setClipboard moment toastr */
 
 $(() => {
     'use strict'
@@ -315,15 +315,6 @@ $(() => {
 
     // 拷贝到剪贴板
     function copy (text) {
-        const btn = $('<button>')
-
-        btn.attr('data-text', text)
-
-        // eslint-disable-next-line no-new
-        new ClipboardJS(btn[0], {
-            text: trigger => trigger.getAttribute('data-text')
-        })
-
-        btn.click()
+        GM_setClipboard(text, 'text')
     }
 })
