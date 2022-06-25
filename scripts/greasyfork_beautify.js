@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.16.alpha
+// @version      0.17.alpha
 // @description  自然、优雅，仿若本该如此...
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -91,6 +91,8 @@ const lessInput = `
         }
     }
 
+    // --------------------------------------------- 代码高亮
+
     .code-container {
         background-color: #282c34;
         border-radius: 8px;
@@ -114,6 +116,11 @@ const lessInput = `
             background-color: rgba(78, 86, 102, 0);
         }
 
+        // 边角
+        ::-webkit-scrollbar-corner {
+            background-color: #282c34;
+        }
+
         &:hover {
             ::-webkit-scrollbar-thumb {
                 background-color: rgba(78, 86, 102, .5);
@@ -127,6 +134,8 @@ const lessInput = `
         pre {
             code {
                 font-family: Consolas;
+                overflow: auto;
+                max-height: calc(100vh - 471px);
 
                 .marker {
                     display: inline-block;
@@ -137,6 +146,7 @@ const lessInput = `
         }
     }
 
+    // --------------------------------------------- 页码
 
     .pagination {
         margin-top: 20px !important;
