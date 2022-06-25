@@ -1,5 +1,6 @@
-导航 navList 的格式
+### 导航 navList 的格式
 
+```js
 navList: [
     {
         label: '脚本列表',
@@ -35,3 +36,4 @@ navList: [
         ]
     }
 ]
+```
