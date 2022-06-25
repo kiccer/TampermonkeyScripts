@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.15.alpha
+// @version      0.16.alpha
 // @description  自然、优雅，仿若本该如此...
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -475,7 +475,7 @@ $(() => {
         const totalLines = htmlSplit.length
 
         $(pre).find('code').html(
-            htmlSplit.map((n, i) => `<span class="marker" style="width: ${String(totalLines).length}em;">${i + 1}</span>${n}`).join('\n')
+            htmlSplit.map((n, i) => `<span class="marker" style="width: calc(${String(totalLines).length * 0.5}em + 20px);">${i + 1}</span>${n}`).join('\n')
         )
     })
 
