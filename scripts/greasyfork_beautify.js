@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.13.alpha
+// @version      0.14.alpha
 // @description  自然、优雅，仿若本该如此...
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -10,7 +10,7 @@
 // @icon         https://greasyfork.org/packs/media/images/blacklogo96-b2384000fca45aa17e45eb417cbcbb59.png
 // @require      https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
-// @resource less https://cdn.bootcdn.net/ajax/libs/less.js/4.1.3/less.min.js
+// @require      https://cdn.bootcdn.net/ajax/libs/less.js/4.1.3/less.min.js
 // @resource normalize.css https://cdn.bootcdn.net/ajax/libs/normalize/8.0.1/normalize.min.css
 // @run-at       document-start
 // @grant        GM_info
@@ -26,9 +26,6 @@ const VERSION = GM_info.script.version
 if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
     location.href = location.href.replace(/^(https:\/\/greasyfork\.org\/)[a-zA-Z-]+(\/?.*)/, `$1${navigator.language}$2`)
 }
-
-// eslint-disable-next-line no-eval
-eval(GM_getResourceText('less'))
 
 const lessOptions = {}
 
@@ -323,7 +320,7 @@ less.render(lessInput, lessOptions).then(output => {
     console.error(err)
 })
 
-window.addEventListener('load', () => {
+$(() => {
     // 样式初始化
     GM_addStyle(GM_getResourceText('normalize.css'))
 
