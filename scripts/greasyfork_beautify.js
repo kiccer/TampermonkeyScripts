@@ -100,24 +100,24 @@ const lessInput = `
         max-height: 100%;
         overflow: visible;
 
-        // 定义滚动条高宽及背景高宽分别对应横竖滚动条的尺寸
+        // 定义滚动条
         ::-webkit-scrollbar {
             width: 14px;
             height: 14px;
             background-color: transparent;
         }
 
-        // 定义滚动条轨道内阴影+圆角
+        // 定义滚动条轨道
         ::-webkit-scrollbar-track {
             background-color: transparent;
         }
 
-        // 定义滑块内阴影+圆角
+        // 定义滑块
         ::-webkit-scrollbar-thumb {
             background-color: rgba(78, 86, 102, 0);
         }
 
-        // 边角
+        // 定义边角
         ::-webkit-scrollbar-corner {
             background-color: transparent;
         }
