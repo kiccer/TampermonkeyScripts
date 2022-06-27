@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.19.alpha
+// @version      0.20.alpha
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -160,6 +160,14 @@ const lessInput = `
             text-align: center;
             text-decoration: none !important;
         }
+
+        > a {
+            background-color: #f7f7f7;
+
+            &:hover {
+                background-color: #e1e1e1;
+            }
+        }
     }
 
     // --------------------------------------------- 输入框
@@ -228,20 +236,6 @@ const lessInput = `
 
                     h1 {
                         font-size: 36px;
-                        display: flex;
-                        display: flex;
-                        align-items: baseline;
-
-                        &::after {
-                            content: "Greasyfork Beautify V${VERSION}";
-                            font-size: 12px;
-                            letter-spacing: 1px;
-                            font-family: "微软雅黑";
-                            font-weight: 200;
-                            color: rgba(255, 255, 255, .5);
-                            line-height: 1;
-                            margin-left: 10px;
-                        }
                     }
                 }
             }
@@ -253,16 +247,28 @@ const lessInput = `
             background-color: #343434;
 
             .user-main {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
                 margin: auto;
                 max-width: 1200px;
                 height: @user_container_height;
-                line-height: @user_container_height;
-                text-align: right;
-                font-size: 14px;
                 padding-right: 10px;
 
                 @media screen and (max-width: 1228px) {
                     margin: auto 1.2vw;
+                }
+
+                .script-version {
+                    font-size: 12px;
+                    letter-spacing: 1px;
+                    font-family: "微软雅黑";
+                    font-weight: 200;
+                    color: rgba(255, 255, 255, .3);
+                }
+
+                .login-info {
+                    font-size: 14px;
                 }
             }
         }
@@ -442,13 +448,19 @@ $(() => {
         template: `
             <div id="user-container">
                 <div class="user-main">
-                    <a
-                        :href="dom.attr('href')"
-                    >{{ dom.text() }}</a>
+                    <div class="script-version">
+                        Greasyfork Beautify V${VERSION}
+                    </div>
 
-                    <template v-if="isLogin">
-                        [<a :href="logoutDom.attr('href')">{{ logoutDom.text() }}</a>]
-                    </template>
+                    <div class="login-info">
+                        <a
+                            :href="dom.attr('href')"
+                        >{{ dom.text() }}</a>
+
+                        <template v-if="isLogin">
+                            [<a :href="logoutDom.attr('href')">{{ logoutDom.text() }}</a>]
+                        </template>
+                    </div>
                 </div>
             </div>
         `,
