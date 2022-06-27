@@ -135,12 +135,14 @@ const lessInput = `
         pre {
             code {
                 font-family: Consolas;
+                cursor: text;
                 overflow: auto;
 
                 .marker {
                     display: inline-block;
                     color: #636d83;
                     user-select: none;
+                    cursor: auto;
                 }
             }
         }
