@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.0.beta.1
+// @version      1.0.beta.2
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -386,6 +386,13 @@ const lessInput = `
                     transition: box-shadow .2s;
                     box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
                 }
+
+                &.loading::before {
+                    content: "";
+                    padding-left: 18px;
+                    background-image: url("https://raw.githubusercontent.com/kiccer/TampermonkeyScripts/master/static/img/loading.webp");
+                    background-size: 100% 100%;
+                }
             }
         }
     }
@@ -717,11 +724,26 @@ $(() => {
 
         // TODO 显示脚本图标 (看情况，如果加了图标不好布局就算了)
 
+        // 信息占位
+        card.find('.inline-script-stats').append(`
+            <dt class="script-show-version"><span>...</span></dt>
+            <dd class="script-show-version"><span></span></dd>
+        `)
+
+        // 下载按钮占位
+        card.append(`
+            <a class="install-link loading"></a>
+        `)
+
         $.ajax({
             type: 'get',
             url: href,
             success: res => {
                 const html = $(res)
+
+                // 删除占位元素
+                card.find('.script-show-version').remove()
+                card.find('.install-link.loading').remove()
 
                 // 版本
                 card.find('.inline-script-stats').append(
