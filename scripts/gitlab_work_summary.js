@@ -21,7 +21,7 @@
 // @noframes
 // ==/UserScript==
 
-/* globals $ GM_addStyle GM_getResourceText GM_xmlhttpRequest GM_setClipboard moment toastr */
+/* globals $ moment toastr */
 
 $(() => {
     'use strict'

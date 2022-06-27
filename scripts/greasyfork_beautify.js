@@ -21,7 +21,7 @@
 // @grant        GM_getResourceText
 // ==/UserScript==
 
-/* globals GM_info GM_addStyle GM_getResourceText $ less Vue hljs */
+/* globals $ less Vue hljs */
 
 const VERSION = GM_info.script.version
 
@@ -30,7 +30,7 @@ if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
     location.href = location.href.replace(/^(https:\/\/greasyfork\.org\/)[a-zA-Z-]+(\/?.*)/, `$1${navigator.language}$2`)
 }
 
-// 样式初始化
+// 样式注入
 GM_addStyle(GM_getResourceText('normalize.css'))
 GM_addStyle(GM_getResourceText('atom-one-dark.css'))
 
