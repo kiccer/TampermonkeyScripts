@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.21.alpha
+// @version      0.22.alpha
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -135,7 +135,6 @@ const lessInput = `
             code {
                 font-family: Consolas;
                 overflow: auto;
-                max-height: calc(100vh - 471px);
 
                 .marker {
                     display: inline-block;
@@ -383,6 +382,25 @@ less.render(lessInput, lessOptions).then(output => {
 }, err => {
     console.error(err)
 })
+
+// 查看代码页面简化，隐藏信息
+if (/https:\/\/greasyfork\.org\/[a-zA-Z-]+\/scripts\/\d{6}-.+\/code/.test(location.href)) {
+    GM_addStyle(`
+        #script-info header,
+        #install-area,
+        #script-feedback-suggestion {
+            display: none;
+        }
+
+        #script-content {
+            margin-top: 16px;
+        }
+
+        .code-container pre code {
+            max-height: calc(100vh - 267px);
+        }
+    `)
+}
 
 $(() => {
     // 导航
