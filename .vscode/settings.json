@@ -3,6 +3,7 @@
         "daterange",
         "datetime",
         "GM_xmlhttpRequest",
-        "linenums"
+        "linenums",
+        "Violentmonkey"
     ]
 }
