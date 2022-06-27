@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.0.1
+// @version      1.1
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -16,12 +16,10 @@
 // @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/languages/javascript.min.js
 // @resource normalize.css https://cdn.bootcdn.net/ajax/libs/normalize/8.0.1/normalize.min.css
 // @resource atom-one-dark.css https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css
-// @resource loading.webp https://raw.githubusercontent.com/kiccer/TampermonkeyScripts/master/static/img/loading.webp
 // @run-at       document-start
 // @grant        GM_info
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
-// @grant        GM_getResourceURL
 // ==/UserScript==
 
 /* globals $ less Vue hljs */
@@ -402,11 +400,21 @@ const lessInput = `
                     box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
                 }
 
-                &.loading::before {
-                    content: "";
-                    padding-left: 18px;
-                    background-image: url("${GM_getResourceURL('loading.webp')}");
-                    background-size: 100% 100%;
+                &.lum-lightbox-loader {
+                    border-left: 10px solid #005200;
+                    border-right: 10px solid #005200;
+                    position: relative;
+                    min-height: 30px;
+                    min-width: 70px;
+
+                    &::before,
+                    &::after {
+                        width: 1em;
+                        height: 1em;
+                        margin-top: -0.5em;
+                        border-radius: 1em;
+                        background: hsla(0, 0%, 100%, .5);
+                    }
                 }
             }
         }
@@ -747,7 +755,7 @@ $(() => {
 
         // 下载按钮占位
         card.append(`
-            <a class="install-link loading"></a>
+            <a class="install-link lum-lightbox-loader"></a>
         `)
 
         $.ajax({
@@ -758,7 +766,7 @@ $(() => {
 
                 // 删除占位元素
                 card.find('.script-show-version').remove()
-                card.find('.install-link.loading').remove()
+                card.find('.install-link.lum-lightbox-loader').remove()
 
                 // 版本
                 card.find('.inline-script-stats').append(
