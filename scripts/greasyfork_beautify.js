@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.0
+// @version      1.0.1
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -358,21 +358,31 @@ const lessInput = `
                 box-shadow: inset 0 1px rgb(0 0 0 / 10%), inset 0 -1px rgb(0 0 0 / 10%);
             }
 
-            .script-description {
-                .ellipsis(3);
-                text-indent: 2em;
-                margin: 10px 0 10px;
-                height: 4.5em;
-                font-size: 14px;
+            & > article {
+                & > h2 {
+                    & > strong {
+                        display: none;
+                    }
 
-                #install-area {
-                    display: none;
+                    .script-description {
+                        .ellipsis(3);
+                        text-indent: 2em;
+                        margin: 10px 0 10px;
+                        height: 4.5em;
+                        font-size: 14px;
+        
+                        #install-area {
+                            display: none;
+                        }
+                    }
                 }
             }
 
             .inline-script-stats {
-                padding-top: 10px;
+                padding: 10px 0;
+                // margin-bottom: 10px;
                 border-top: 1px solid #ebebeb;
+                // border-bottom: 1px solid #ebebeb;
 
                 dt {
                     width: 40%;
