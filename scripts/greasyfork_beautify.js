@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      0.20.alpha
+// @version      0.21.alpha
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -162,10 +162,10 @@ const lessInput = `
         }
 
         > a {
-            background-color: #f7f7f7;
+            background-color: #f7f7f7 !important;
 
             &:hover {
-                background-color: #e1e1e1;
+                background-color: #e1e1e1 !important;
             }
         }
     }
@@ -327,6 +327,10 @@ const lessInput = `
         grid-gap: 20px;
         border: 0;
         box-shadow: none;
+
+        @media screen and (max-width: 1228px) {
+            grid-template-columns: repeat(1, 1fr);
+        }
 
         li {
             border: 1px solid #bbb;
