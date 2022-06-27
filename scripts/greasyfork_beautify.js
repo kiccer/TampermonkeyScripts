@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.0.beta.2
+// @version      1.0
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -16,11 +16,12 @@
 // @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/languages/javascript.min.js
 // @resource normalize.css https://cdn.bootcdn.net/ajax/libs/normalize/8.0.1/normalize.min.css
 // @resource atom-one-dark.css https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css
+// @resource loading.webp https://raw.githubusercontent.com/kiccer/TampermonkeyScripts/master/static/img/loading.webp
 // @run-at       document-start
 // @grant        GM_info
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
-// @grant        GM_xmlhttpRequest
+// @grant        GM_getResourceURL
 // ==/UserScript==
 
 /* globals $ less Vue hljs */
@@ -363,6 +364,10 @@ const lessInput = `
                 margin: 10px 0 10px;
                 height: 4.5em;
                 font-size: 14px;
+
+                #install-area {
+                    display: none;
+                }
             }
 
             .inline-script-stats {
@@ -390,7 +395,7 @@ const lessInput = `
                 &.loading::before {
                     content: "";
                     padding-left: 18px;
-                    background-image: url("https://raw.githubusercontent.com/kiccer/TampermonkeyScripts/master/static/img/loading.webp");
+                    background-image: url("${GM_getResourceURL('loading.webp')}");
                     background-size: 100% 100%;
                 }
             }
