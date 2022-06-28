@@ -4,6 +4,7 @@
 // @version      1.0
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
+// @match        https://greasyfork.org/*
 // @grant        none
 // ==/UserScript==
 
