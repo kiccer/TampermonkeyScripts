@@ -1,39 +1,12 @@
-### 导航 navList 的格式
+# Greasyfork Beautify
 
-```js
-navList: [
-    {
-        label: '脚本列表',
-        url: '/zh-CN/scripts'
-    },
-    {
-        label: '论坛',
-        url: '/zh-CN/discussions'
-    },
-    {
-        label: '站点帮助',
-        url: '/zh-CN/help'
-    },
-    {
-        label: '更多',
-        list: [
-            {
-                label: '高级搜索',
-                url: '/zh-CN/search'
-            },
-            {
-                label: '用户列表',
-                url: '/zh-CN/users'
-            },
-            {
-                label: '库',
-                url: '/zh-CN/scripts/libraries'
-            },
-            {
-                label: '管理日志',
-                url: '/zh-CN/moderator_actions'
-            }
-        ]
-    }
-]
-```
+## 功能列表
+
+    * 导航栏样式美化
+    * 代码高亮(atom-one-dark + vscode 风格)
+    * 脚本列表改为卡片布局
+        - 样式美化
+        - 增加版本信息
+        - 增加安装按钮
+    * 页码样式风格统一
+    * （更多美化还在开发中）
