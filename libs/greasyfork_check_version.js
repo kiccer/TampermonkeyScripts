@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         checkVersion
 // @description  Greasyfork Check Version Source Code
-// @version      1.0
+// @version      1.0.1
 // @author       kiccer<1072907338@qq.com>
 // @license      MIT
 // @match        https://greasyfork.org/*
