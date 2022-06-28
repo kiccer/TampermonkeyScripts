@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.1.1
+// @version      1.2
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -26,10 +26,10 @@
 
 const VERSION = GM_info.script.version
 
-// 自动根据浏览器语言设置当前语言
-if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
-    location.href = location.href.replace(/^(https:\/\/greasyfork\.org\/)[a-zA-Z-]+(\/?.*)/, `$1${navigator.language}$2`)
-}
+// // 自动根据浏览器语言设置当前语言
+// if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
+//     location.href = location.href.replace(/^(https:\/\/greasyfork\.org\/)[a-zA-Z-]+(\/?.*)/, `$1${navigator.language}$2`)
+// }
 
 // 样式注入
 GM_addStyle(GM_getResourceText('normalize.css'))
@@ -422,6 +422,22 @@ const lessInput = `
             }
         }
     }
+
+    // --------------------------------------------- 列表右侧选项组
+
+    .list-option-groups {
+        #language-selector {
+            + * {
+                margin-top: 10px;
+            }
+            
+            #language-selector-locale {
+                width: 100%;
+                border: 1px solid #bfbfbf;
+                border-radius: 4px;
+            }
+        }
+    }
 `
 
 less.render(lessInput, lessOptions).then(output => {
@@ -789,19 +805,9 @@ $(() => {
         })
     })
 
-    // 脚本列表页面
-    // if (/^https:\/\/greasyfork\.org\/[a-zA-Z-]+\/scripts$/.test(location.href)) {
-    //     $('#browse-script-list li[data-script-id]').each((i, dom) => {
-    //         const li = $(dom)
-    //         const cardHeader = $('<div class="card-header">')
-    //         const score = li.find('dd.script-list-ratings').data('rating-score')
-    //         const scoreWrap = $('<span class="score">')
-    //         const install = $('<a>')
-    //         li.find('> article').before(cardHeader)
-    //         cardHeader.append(scoreWrap)
-    //         cardHeader.append(install)
-    //         scoreWrap.html(score)
-    //         install.html('INSTALL')
-    //     })
-    // }
+    // 列表右侧选项组
+    $('.list-option-groups > *:eq(0)').before(
+        // 设置语言
+        $('#language-selector')
+    )
 })
