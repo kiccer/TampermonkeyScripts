@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.3
+// @version      1.4
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -11,30 +11,45 @@
 // @match        https://sleazyfork.org/*
 // @icon         https://greasyfork.org/packs/media/images/blacklogo96-b2384000fca45aa17e45eb417cbcbb59.png
 // @require      https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js
+// @require      https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.9/index.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/less.js/4.1.3/less.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/highlight.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/languages/javascript.min.js
 // @require      https://greasyfork.org/scripts/447149-checkversion/code/checkVersion.js?version=1065242
 // @resource normalize.css https://cdn.bootcdn.net/ajax/libs/normalize/8.0.1/normalize.min.css
+// @resource element-ui.css https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.9/theme-chalk/index.min.css
+// @resource element-icons https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.9/theme-chalk/fonts/element-icons.ttf
 // @resource atom-one-dark.css https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css
 // @run-at       document-start
 // @grant        GM_info
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @grant        GM_addStyle
+// @grant        GM_getResourceURL
 // @grant        GM_getResourceText
+// @grant        GM_registerMenuCommand
 // ==/UserScript==
 
-/* globals $ less Vue hljs checkVersion */
+/* globals $ less Vue hljs checkVersion ELEMENT */
+
+Vue.config.devtools = true
+Vue.use(ELEMENT)
+
+const getSettings = () => {
+    return Object.assign({
+        script_list_columns_num: 2,
+        show_install_button_in_card: true,
+        show_version_info_in_card: true
+    }, JSON.parse(GM_getValue('formData') || '{}'))
+}
 
 const VERSION = GM_info.script.version
-
-// // 自动根据浏览器语言设置当前语言
-// if (!new RegExp(`/${navigator.language}/?`).test(location.href)) {
-//     location.href = location.href.replace(/^(https:\/\/greasyfork\.org\/)[a-zA-Z-]+(\/?.*)/, `$1${navigator.language}$2`)
-// }
+const settings = getSettings()
 
 // 样式注入
 GM_addStyle(GM_getResourceText('normalize.css'))
+GM_addStyle(GM_getResourceText('element-ui.css'))
 GM_addStyle(GM_getResourceText('atom-one-dark.css'))
 
 const lessOptions = {}
@@ -92,6 +107,14 @@ const lessInput = `
         &:visited {
             color: rgb(38, 38, 38);
         }
+    }
+
+    // --------------------------------------------- element-ui
+
+    // 解决 element-icons 图标引用不到问题
+    @font-face {
+        font-family: element-icons;
+        src: url(${GM_getResourceURL('element-icons')}),
     }
 
     // --------------------------------------------- 代码高亮
@@ -272,6 +295,11 @@ const lessInput = `
                     font-family: "微软雅黑";
                     font-weight: 200;
                     color: rgba(255, 255, 255, .3);
+
+                    .has-new-version {
+                        color: lime;
+                        margin-left: 5px;
+                    }
                 }
 
                 .login-info {
@@ -331,7 +359,7 @@ const lessInput = `
     #user-deleted-script-list,
     #browse-script-list {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(${settings.script_list_columns_num}, 1fr);
         grid-gap: 20px;
         border: 0;
         box-shadow: none;
@@ -364,7 +392,7 @@ const lessInput = `
                     & > .badge,
                     & > .name-description-separator,
                     & > strong {
-                        display: none;
+                        display: none; // 兼容 “大人的Greasyfork”
                     }
 
                     .script-description {
@@ -376,7 +404,7 @@ const lessInput = `
         
                         strong,
                         #install-area {
-                            display: none;
+                            display: none; // 兼容 “大人的Greasyfork”
                         }
                     }
                 }
@@ -472,6 +500,68 @@ if (/https:\/\/greasyfork\.org\/[a-zA-Z-]+\/scripts\/\d{6}-.+\/code/.test(locati
     `)
 }
 
+// 脚本卡片美化
+function scriptCardBeautify () {
+    $(`
+        #user-script-list li[data-script-id],
+        #user-deleted-script-list li[data-script-id],
+        #browse-script-list li[data-script-id]
+    `).each((i, n) => {
+        const card = $(n)
+        const href = card.find('> article a.script-link').attr('href')
+
+        // TODO 显示脚本图标 (看情况，如果加了图标不好布局就算了)
+
+        // 信息占位
+        if (settings.show_version_info_in_card) {
+            card.find('.inline-script-stats').append(`
+                <dt class="script-show-version"><span>...</span></dt>
+                <dd class="script-show-version"><span></span></dd>
+            `)
+        }
+
+        // 下载按钮占位
+        if (settings.show_install_button_in_card) {
+            card.append(`
+                <a class="install-link lum-lightbox-loader"></a>
+            `)
+        }
+
+        $.ajax({
+            type: 'get',
+            url: href,
+            success: res => {
+                const html = $(res)
+
+                if (settings.show_install_button_in_card) {
+                    // 删除占位元素
+                    card.find('.install-link.lum-lightbox-loader').remove()
+
+                    // 下载按钮
+                    card.append(
+                        html.find('#install-area .install-link').eq(0).addClass('install-link-copy')
+                    )
+
+                    // 下载按钮文案根据已安装的版本号调整
+                    setTimeout(() => {
+                        checkVersion.checkForUpdatesJS(card.find('.install-link-copy')[0], true)
+                    })
+                }
+
+                if (settings.show_version_info_in_card) {
+                    // 删除占位元素
+                    card.find('.script-show-version').remove()
+
+                    // 版本
+                    card.find('.inline-script-stats').append(
+                        html.find('.script-show-version')
+                    )
+                }
+            }
+        })
+    })
+}
+
 // 页面加载完成后执行
 $(() => {
     // 导航
@@ -480,7 +570,7 @@ $(() => {
     document.querySelector('.width-constraint').appendChild(navContainer)
 
     // eslint-disable-next-line no-unused-vars
-    const nav = new Vue({
+    const navApp = new Vue({
         el: '#site-nav-vue',
 
         template: `
@@ -536,13 +626,18 @@ $(() => {
     document.querySelector('#main-header').appendChild(userContainer)
 
     // eslint-disable-next-line no-unused-vars
-    const user = new Vue({
+    const userApp = new Vue({
         el: '#user-container',
         template: `
             <div id="user-container">
                 <div class="user-main">
                     <div class="script-version">
                         Greasyfork Beautify V${VERSION}
+                        <a
+                            class="has-new-version"
+                            href="https://greasyfork.org/scripts/446849-greasyfork-beautify/code/Greasyfork%20Beautify.user.js"
+                            v-if="hasNewVersion"
+                        >NEW</a>
                     </div>
 
                     <div class="login-info">
@@ -560,9 +655,26 @@ $(() => {
 
         data () {
             return {
+                hasNewVersion: false,
                 dom: $('#nav-user-info .user-profile-link a, #nav-user-info .sign-in-link a'),
                 logoutDom: $('.sign-out-link a'),
                 isLogin: $('.sign-out-link').length > 0 // 存在登出按钮则表示已登录
+            }
+        },
+
+        created () {
+            this.versionCheck()
+        },
+
+        methods: {
+            versionCheck () {
+                $.ajax({
+                    url: 'https://greasyfork.org/zh-CN/scripts/446849-greasyfork-beautify',
+                    success: res => {
+                        const version = $(res).find('dd.script-show-version span').text()
+                        this.hasNewVersion = version !== VERSION
+                    }
+                })
             }
         }
     })
@@ -595,54 +707,9 @@ $(() => {
     })
 
     // 脚本列表页面，卡片
-    $(`
-        #user-script-list li[data-script-id],
-        #user-deleted-script-list li[data-script-id],
-        #browse-script-list li[data-script-id]
-    `).each((i, n) => {
-        const card = $(n)
-        const href = card.find('> article a.script-link').attr('href')
-
-        // TODO 显示脚本图标 (看情况，如果加了图标不好布局就算了)
-
-        // 信息占位
-        card.find('.inline-script-stats').append(`
-            <dt class="script-show-version"><span>...</span></dt>
-            <dd class="script-show-version"><span></span></dd>
-        `)
-
-        // 下载按钮占位
-        card.append(`
-            <a class="install-link lum-lightbox-loader"></a>
-        `)
-
-        $.ajax({
-            type: 'get',
-            url: href,
-            success: res => {
-                const html = $(res)
-
-                // 删除占位元素
-                card.find('.script-show-version').remove()
-                card.find('.install-link.lum-lightbox-loader').remove()
-
-                // 版本
-                card.find('.inline-script-stats').append(
-                    html.find('.script-show-version')
-                )
-
-                // 下载按钮
-                card.append(
-                    html.find('#install-area .install-link').eq(0).addClass('install-link-copy')
-                )
-
-                // 下载按钮文案根据已安装的版本号调整
-                setTimeout(() => {
-                    checkVersion.checkForUpdatesJS(card.find('.install-link-copy')[0], true)
-                })
-            }
-        })
-    })
+    if (settings.show_install_button_in_card || settings.show_version_info_in_card) {
+        scriptCardBeautify()
+    }
 
     // 列表右侧选项组
     $('.list-option-groups > *:eq(0)').before(
@@ -650,5 +717,72 @@ $(() => {
         $('#language-selector')
     )
 
-    // TODO 增加右键菜单 “设置” (脚本列表单双列开关、安装按钮显示开关、版本信息显示开关)
+    // 注册菜单
+    $('body').append($('<div id="greasyfork-beautify-settings">'))
+
+    const settingsApp = new Vue({
+        el: '#greasyfork-beautify-settings',
+
+        template: `
+            <el-dialog
+                width="600px"
+                title="Greasyfork Beautify V${VERSION}"
+                :visible.sync="show"
+                @closed="onClosed"
+            >
+                <el-form
+                    size="mini"
+                    label-width="120px"
+                    :model="formData"
+                >
+                    <el-form-item label="脚本列表列数">
+                        <el-input-number
+                            label="描述文字"
+                            v-model="formData.script_list_columns_num"
+                            :min="1"
+                            :max="2"
+                        />
+                    </el-form-item>
+
+                    <el-form-item label="显示安装按钮">
+                        <el-switch
+                            v-model="formData.show_install_button_in_card"
+                        />
+                    </el-form-item>
+
+                    <el-form-item label="显示版本信息">
+                        <el-switch
+                            v-model="formData.show_version_info_in_card"
+                        />
+                    </el-form-item>
+                </el-form>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="onSubmit">确 定</el-button>
+                </span>
+            </el-dialog>
+        `,
+
+        data () {
+            return {
+                show: false,
+                formData: getSettings()
+            }
+        },
+
+        methods: {
+            onClosed () {
+                this.formData = getSettings()
+            },
+
+            onSubmit () {
+                GM_setValue('formData', JSON.stringify(this.formData))
+                location.reload()
+            }
+        }
+    })
+
+    GM_registerMenuCommand('美化设置', e => {
+        settingsApp.show = true
+    })
 })
