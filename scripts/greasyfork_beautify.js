@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.4.5
+// @version      1.4.6
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -35,12 +35,24 @@
 
 Vue.use(ELEMENT)
 
+if (/\(Development\)$/i.test(GM_info.script.name)) {
+    Vue.config.devtools = true
+}
+
+// 默认设置
+const defaultSettings = {
+    script_list_columns_num: 2,
+    show_install_button_in_card: true,
+    show_version_info_in_card: true
+}
+
+// 获取设置
 const getSettings = () => {
-    return Object.assign({
-        script_list_columns_num: 2,
-        show_install_button_in_card: true,
-        show_version_info_in_card: true
-    }, JSON.parse(GM_getValue('formData') || '{}'))
+    return Object.assign(
+        {},
+        defaultSettings,
+        JSON.parse(GM_getValue('formData') || '{}')
+    )
 }
 
 const VERSION = GM_info.script.version
@@ -758,6 +770,7 @@ $(() => {
                 </el-form>
 
                 <span slot="footer" class="dialog-footer">
+                    <el-button @click="onReset">重 置</el-button>
                     <el-button type="primary" @click="onSubmit">确 定</el-button>
                 </span>
             </el-dialog>
@@ -772,7 +785,11 @@ $(() => {
 
         methods: {
             onClosed () {
-                this.formData = getSettings()
+                Object.assign(this.formData, getSettings())
+            },
+
+            onReset () {
+                Object.assign(this.formData, defaultSettings)
             },
 
             onSubmit () {
