@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.4
+// @version      1.4.1
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -636,8 +636,8 @@ $(() => {
                         <a
                             class="has-new-version"
                             href="https://greasyfork.org/scripts/446849-greasyfork-beautify/code/Greasyfork%20Beautify.user.js"
-                            v-if="hasNewVersion"
-                        >NEW</a>
+                            v-if="lastVersion !== ${VERSION}"
+                        >Update to V{{ lastVersion }}</a>
                     </div>
 
                     <div class="login-info">
@@ -655,7 +655,8 @@ $(() => {
 
         data () {
             return {
-                hasNewVersion: false,
+                lastVersion: false,
+                lastVersionInstallUrl: '',
                 dom: $('#nav-user-info .user-profile-link a, #nav-user-info .sign-in-link a'),
                 logoutDom: $('.sign-out-link a'),
                 isLogin: $('.sign-out-link').length > 0 // 存在登出按钮则表示已登录
@@ -671,8 +672,9 @@ $(() => {
                 $.ajax({
                     url: 'https://greasyfork.org/zh-CN/scripts/446849-greasyfork-beautify',
                     success: res => {
-                        const version = $(res).find('dd.script-show-version span').text()
-                        this.hasNewVersion = version !== VERSION
+                        const html = $(res)
+                        this.lastVersion = html.find('dd.script-show-version span').text()
+                        this.lastVersionInstallUrl = html.find('#install-area .install-link:eq(0)').attr('href')
                     }
                 })
             }
