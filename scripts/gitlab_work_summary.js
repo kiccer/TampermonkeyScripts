@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      2.3.1
+// @version      2.3.2
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。(主要为公司内部开发使用。因 gitlab 版本不确定性，不保证完全兼容其他 gitlab 版本，如有需求，请到 github 留 issues。)
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -134,13 +134,13 @@ $(() => {
     function findDate (start, type = [0]) {
         return new Promise((resolve, reject) => {
             const loop = (time) => {
-                // 节假日万年历API: http://www.free-api.com/doc/562
+                // 节假日万年历API: https://www.mxnzp.com/doc/detail?id=1
                 GM_xmlhttpRequest({
-                    url: `https://www.mxnzp.com/api/holiday/single/${time}?ignoreHoliday=false&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09`,
+                    url: `https://www.mxnzp.com/api/holiday/single/${time}?ignoreHoliday=false&app_id=rkkpflimunbjzeki&app_secret=SHI3cDNEQTRXOHNnYmxiallNeEM3Zz09`,
                     onload: res => {
                         const { data, code, msg } = JSON.parse(res.response)
 
-                        if (code === 200) {
+                        if (code === 1) {
                             output(`${moment(time).format('YYYY-MM-DD')} 是 ${['工作日', '周末', '法定节假日'][data.type]}`)
 
                             // console.log(data)
