@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      2.3
+// @version      2.3.1
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。(主要为公司内部开发使用。因 gitlab 版本不确定性，不保证完全兼容其他 gitlab 版本，如有需求，请到 github 留 issues。)
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -138,14 +138,19 @@ $(() => {
                 GM_xmlhttpRequest({
                     url: `https://www.mxnzp.com/api/holiday/single/${time}?ignoreHoliday=false&app_id=rgihdrm0kslojqvm&app_secret=WnhrK251TWlUUThqaVFWbG5OeGQwdz09`,
                     onload: res => {
-                        const { data } = JSON.parse(res.response)
-                        output(`${moment(time).format('YYYY-MM-DD')} 是 ${['工作日', '周末', '法定节假日'][data.type]}`)
+                        const { data, code, msg } = JSON.parse(res.response)
 
-                        // console.log(data)
-                        if (type.includes(data.type)) {
-                            resolve(moment(time))
+                        if (code === 200) {
+                            output(`${moment(time).format('YYYY-MM-DD')} 是 ${['工作日', '周末', '法定节假日'][data.type]}`)
+
+                            // console.log(data)
+                            if (type.includes(data.type)) {
+                                resolve(moment(time))
+                            } else {
+                                loop(moment(time).subtract(1, 'day').format('YYYYMMDD'))
+                            }
                         } else {
-                            loop(moment(time).subtract(1, 'day').format('YYYYMMDD'))
+                            alert(msg)
                         }
                     }
                 })
