@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.4.7
+// @version      1.5
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -573,6 +573,14 @@ function scriptCardBeautify () {
         })
     })
 }
+
+// 页面获得焦点时
+window.addEventListener('focus', e => {
+    // 自动更新安装状态
+    $('.script-list li[data-script-id] a.install-link-copy').each((i, n) => {
+        checkVersion.checkForUpdatesJS(n, true)
+    })
+})
 
 // 页面加载完成后执行
 $(() => {
