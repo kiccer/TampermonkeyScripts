@@ -1,5 +1,8 @@
 # Greasyfork Beautify
 
+## 效果图
+![5](../static/img/greasyfork_beautify_renderings.png)
+
 ## 功能列表
 
     * 导航栏样式美化
