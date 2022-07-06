@@ -3,6 +3,7 @@
 ## 效果图
 
 ![](https://github.com/kiccer/TampermonkeyScripts/blob/master/static/img/greasyfork_beautify_renderings.png?raw=true)
+![](https://github.com/kiccer/TampermonkeyScripts/blob/master/static/img/greasyfork_beautify_renderings2.png?raw=true)
 
 ## 功能列表
 
