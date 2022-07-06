@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greasyfork Beautify
 // @namespace    https://github.com/kiccer
-// @version      1.5
+// @version      1.6
 // @description  优化导航栏样式 / 脚本列表改为卡片布局 / 代码高亮(atom-one-dark + vscode 风格) 等……融入式美化，自然、优雅，没有突兀感，仿佛页面原本就是如此……（更多优化逐步完善中！）
 // @description:en  Optimize the navigation bar style / script list to card layout / code highlighting (atom-one-dark + vscode style), etc. Into the style of beautification, more natural, more elegant, no sense of abruptness, as if the page is originally so. (more optimization in progress!)
 // @author       kiccer<1072907338@qq.com>
@@ -13,6 +13,7 @@
 // @require      https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.9/index.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js
+// @require      https://cdn.bootcdn.net/ajax/libs/javascript-detect-element-resize/0.5.3/jquery.resize.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/less.js/4.1.3/less.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/highlight.min.js
 // @require      https://cdn.bootcdn.net/ajax/libs/highlight.js/11.5.1/languages/javascript.min.js
@@ -523,54 +524,60 @@ function scriptCardBeautify () {
 
         // TODO 显示脚本图标 (看情况，如果加了图标不好布局就算了)
 
-        // 信息占位
-        if (settings.show_version_info_in_card) {
-            card.find('.inline-script-stats').append(`
-                <dt class="script-show-version"><span>...</span></dt>
-                <dd class="script-show-version"><span></span></dd>
-            `)
-        }
+        // 判断这个卡片是否已经美化过了
+        const hasVersionTag = card.find('.script-show-version').length > 0
+        const hasDownloadBtn = card.find('.install-link-copy').length > 0
 
-        // 下载按钮占位
-        if (settings.show_install_button_in_card) {
-            card.append(`
-                <a class="install-link lum-lightbox-loader"></a>
-            `)
-        }
-
-        $.ajax({
-            type: 'get',
-            url: href,
-            success: res => {
-                const html = $(res)
-
-                if (settings.show_install_button_in_card) {
-                    // 删除占位元素
-                    card.find('.install-link.lum-lightbox-loader').remove()
-
-                    // 下载按钮
-                    card.append(
-                        html.find('#install-area .install-link').eq(0).addClass('install-link-copy')
-                    )
-
-                    // 下载按钮文案根据已安装的版本号调整
-                    setTimeout(() => {
-                        const btn = card.find('.install-link-copy')[0]
-                        if (btn) checkVersion.checkForUpdatesJS(btn, true)
-                    })
-                }
-
-                if (settings.show_version_info_in_card) {
-                    // 删除占位元素
-                    card.find('.script-show-version').remove()
-
-                    // 版本
-                    card.find('.inline-script-stats').append(
-                        html.find('.script-show-version')
-                    )
-                }
+        if (!(hasVersionTag && hasDownloadBtn)) {
+            // 信息占位
+            if (settings.show_version_info_in_card) {
+                card.find('.inline-script-stats').append(`
+                    <dt class="script-show-version"><span>...</span></dt>
+                    <dd class="script-show-version"><span></span></dd>
+                `)
             }
-        })
+
+            // 下载按钮占位
+            if (settings.show_install_button_in_card) {
+                card.append(`
+                    <a class="install-link lum-lightbox-loader"></a>
+                `)
+            }
+
+            $.ajax({
+                type: 'get',
+                url: href,
+                success: res => {
+                    const html = $(res)
+
+                    if (settings.show_version_info_in_card) {
+                        // 删除占位元素
+                        card.find('.script-show-version').remove()
+
+                        // 版本
+                        card.find('.inline-script-stats').append(
+                            html.find('.script-show-version')
+                        )
+                    }
+
+                    if (settings.show_install_button_in_card) {
+                        // 删除占位元素
+                        card.find('.install-link.lum-lightbox-loader').remove()
+
+                        // 下载按钮
+                        card.append(
+                            html.find('#install-area .install-link').eq(0).addClass('install-link-copy')
+                        )
+
+                        // 下载按钮文案根据已安装的版本号调整
+                        setTimeout(() => {
+                            const btn = card.find('.install-link-copy')[0]
+                            if (btn) checkVersion.checkForUpdatesJS(btn, true)
+                        })
+                    }
+                }
+            })
+        }
     })
 }
 
@@ -726,9 +733,19 @@ $(() => {
         )
     })
 
+    // 卡片数量记录
+    let cardCountRecord = 0
     // 脚本列表页面，卡片
     if (settings.show_install_button_in_card || settings.show_version_info_in_card) {
-        scriptCardBeautify()
+        // 兼容翻页插件
+        $('.script-list ').resize(e => {
+            const cardCount = $('.script-list li[data-script-id]').length
+
+            if (cardCountRecord !== cardCount) {
+                cardCountRecord = cardCount
+                scriptCardBeautify()
+            }
+        })
     }
 
     // 列表右侧选项组
