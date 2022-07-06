@@ -1,7 +1,7 @@
 # Greasyfork Beautify
 
 ## 效果图
-![5](../static/img/greasyfork_beautify_renderings.png)
+![](https://github.com/kiccer/TampermonkeyScripts/blob/master/static/img/greasyfork_beautify_renderings.png?raw=true)
 
 ## 功能列表
 
