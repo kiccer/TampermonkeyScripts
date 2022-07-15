@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      2.3.3
+// @version      2.3.4
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。(主要为公司内部开发使用。因 gitlab 版本不确定性，不保证完全兼容其他 gitlab 版本，如有需求，请到 github 留 issues。)
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -249,7 +249,7 @@ $(() => {
                     branch: it.find('.event-title strong a[title]').text(),
                     commit: [...it.find('.event_commits .commit')].map(n =>
                         $(n).text().replace(/^\n\n[0-9a-f]{8}\n·\n\s*(.+)\s*\n\n$/i, '$1')
-                    ).filter(n => !/^Merge branch/.test(n))
+                    ).filter(n => !/^Merge.*into.*/.test(n))
                 })
             }
         })
