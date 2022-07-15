@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         一键生成 GitLab 周报汇总
 // @namespace    https://github.com/kiccer
-// @version      2.3.2
+// @version      2.3.3
 // @description  一键生成 GitLab 周报汇总，生成自定义时间段的汇报。(主要为公司内部开发使用。因 gitlab 版本不确定性，不保证完全兼容其他 gitlab 版本，如有需求，请到 github 留 issues。)
 // @author       kiccer<1072907338@qq.com>
 // @supportURL   https://github.com/kiccer/TampermonkeyScripts/issues
@@ -232,10 +232,10 @@ $(() => {
 
     // 获取汇总列表
     async function getSummary (startTime, endTime) {
+        await loadPageUntil(moment(startTime))
+
         const eventItem = $('.content_list_hide .event-item')
         const inScoped = []
-
-        await loadPageUntil(moment(startTime))
 
         // 提取内容
         eventItem.each((index, item) => {
