@@ -544,39 +544,42 @@ function scriptCardBeautify () {
                 `)
             }
 
-            $.ajax({
-                type: 'get',
-                url: href,
-                success: res => {
-                    const html = $(res)
+            // 增加延时，避免请求过多导致 503 错误 （每秒最多 10 个请求）
+            setTimeout(() => {
+                $.ajax({
+                    type: 'get',
+                    url: href,
+                    success: res => {
+                        const html = $(res)
 
-                    if (settings.show_version_info_in_card) {
-                        // 删除占位元素
-                        card.find('.script-show-version').remove()
+                        if (settings.show_version_info_in_card) {
+                            // 删除占位元素
+                            card.find('.script-show-version').remove()
 
-                        // 版本
-                        card.find('.inline-script-stats').append(
-                            html.find('.script-show-version')
-                        )
+                            // 版本
+                            card.find('.inline-script-stats').append(
+                                html.find('.script-show-version')
+                            )
+                        }
+
+                        if (settings.show_install_button_in_card) {
+                            // 删除占位元素
+                            card.find('.install-link.lum-lightbox-loader').remove()
+
+                            // 下载按钮
+                            card.append(
+                                html.find('#install-area .install-link').eq(0).addClass('install-link-copy')
+                            )
+
+                            // 下载按钮文案根据已安装的版本号调整
+                            setTimeout(() => {
+                                const btn = card.find('.install-link-copy')[0]
+                                if (btn) checkVersion.checkForUpdatesJS(btn, true)
+                            })
+                        }
                     }
-
-                    if (settings.show_install_button_in_card) {
-                        // 删除占位元素
-                        card.find('.install-link.lum-lightbox-loader').remove()
-
-                        // 下载按钮
-                        card.append(
-                            html.find('#install-area .install-link').eq(0).addClass('install-link-copy')
-                        )
-
-                        // 下载按钮文案根据已安装的版本号调整
-                        setTimeout(() => {
-                            const btn = card.find('.install-link-copy')[0]
-                            if (btn) checkVersion.checkForUpdatesJS(btn, true)
-                        })
-                    }
-                }
-            })
+                })
+            }, (i % 10) * 1e3)
         }
     })
 }
