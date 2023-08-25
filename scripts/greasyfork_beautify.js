@@ -429,7 +429,7 @@ const lessInput = `
                 // border-bottom: 1px solid #ebebeb;
 
                 dt {
-                    width: 40%;
+                    // width: 40%;
                 }
 
                 dd {
@@ -579,7 +579,7 @@ function scriptCardBeautify () {
                         }
                     }
                 })
-            }, (i % 10) * 1e3)
+            }, (i % 5) * 2e3)
         }
     })
 }
